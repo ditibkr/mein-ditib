@@ -8,7 +8,7 @@ Modulares Vereinsverwaltungsportal für DITIB Krefeld (und weitere islamische Ge
 |-----------|---------|
 | Laravel | 12.x |
 | Filament Admin | 3.x |
-| PHP | 8.3 |
+| PHP | 8.4 |
 | MySQL | 8.0 |
 | Redis | 7.x |
 | Docker | 20.10+ |
@@ -39,7 +39,7 @@ npm install && npm run dev
 
 ## Admin-Zugang (nach Seeding)
 
-- URL: http://localhost:8000/admin
+- URL: https://mein.ditib-krefeld.info/admin
 - E-Mail: admin@ditib-krefeld.de
 - Passwort: Admin123! (sofort ändern!)
 

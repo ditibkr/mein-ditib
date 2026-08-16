@@ -43,11 +43,11 @@ log "6/7 Datenbank befüllen (Rollen + Superadmin)..."
 docker compose exec -T app php artisan db:seed --force
 
 log "7/7 Filament Shield Berechtigungen generieren..."
-docker compose exec -T app php artisan filament:shield:generate --all --panel=admin
+docker compose exec -T app php artisan shield:generate --all --panel=admin
 
 log "=== Erstinstallation abgeschlossen ==="
 log ""
-log "Admin-Panel: http://localhost:8000/admin"
+log "Admin-Panel: https://mein.ditib-krefeld.info/admin"
 log "Login:       admin@ditib-krefeld.de"
 log "Passwort:    Admin123!  <-- SOFORT ÄNDERN!"
 log ""

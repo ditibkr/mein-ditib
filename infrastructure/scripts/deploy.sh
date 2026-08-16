@@ -40,4 +40,4 @@ log "6/6 Queue-Worker neu starten..."
 docker compose -f "${COMPOSE_FILE}" restart queue
 
 log "=== Deployment abgeschlossen ==="
-log "Portal erreichbar unter: http://localhost:8000/admin"
+log "Portal erreichbar unter: https://mein.ditib-krefeld.info/admin"

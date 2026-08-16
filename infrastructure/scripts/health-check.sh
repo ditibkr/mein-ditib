@@ -29,7 +29,7 @@ done
 
 # HTTP-Endpunkt
 log "HTTP-Check:"
-HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000/ 2>/dev/null || echo "000")
+HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8000/ 2>/dev/null || echo "000")
 if [[ "${HTTP_CODE}" =~ ^(200|302|301)$ ]]; then
     ok "HTTP ${HTTP_CODE} - Nginx antwortet"
 else
