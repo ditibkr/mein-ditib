@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/app/Dockerfile
+      target: development
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+    volumes:
+      - ./:/var/www/html
+      - /var/www/html/vendor
+
+  nginx:
+    ports:
+      - "8000:80"
+
+  db:
+    ports:
+      - "3306:3306"
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  adminer:
+    image: adminer:latest
+    container_name: meinditib_adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    networks:
+      - meinditib
