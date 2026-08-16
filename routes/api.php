@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\MemberController;
 use Illuminate\Support\Facades\Route;
 
@@ -12,7 +13,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'me']);
 
-    // Mitglieder API
+    // M11 Dashboard
+    Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
+
+    // M03 Mitglieder API
     Route::prefix('members')->group(function () {
         Route::get('/', [MemberController::class, 'index']);
         Route::post('/', [MemberController::class, 'store']);

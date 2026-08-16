@@ -46,6 +46,9 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Admin/Widgets'), for: 'App\\Filament\\Admin\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
+                \App\Filament\Admin\Widgets\MemberStatsWidget::class,
+                \App\Filament\Admin\Widgets\MemberGrowthChart::class,
+                \App\Filament\Admin\Widgets\MemberCategoryChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
