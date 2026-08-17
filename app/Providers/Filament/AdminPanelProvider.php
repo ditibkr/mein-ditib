@@ -28,7 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->colors([
-                'primary' => Color::Green,
+                'primary' => Color::hex('#C41E3A'),
                 'gray' => Color::Slate,
             ])
             ->brandName(config('app.name', 'DITIB Vereinsportal'))
