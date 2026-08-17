@@ -37,6 +37,7 @@ services:
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - meinditib
+      - proxy-network
     depends_on:
       - app
     healthcheck:
@@ -117,6 +118,8 @@ services:
 networks:
   meinditib:
     driver: bridge
+  proxy-network:
+    external: true
 
 volumes:
   db_data:

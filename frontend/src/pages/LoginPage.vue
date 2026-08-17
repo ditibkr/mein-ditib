@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+  <div class="min-h-screen flex items-center justify-center bg-ditib-light p-4">
     <div class="w-full max-w-md">
       <!-- Logo & Titel -->
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-600 mb-4">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-ditib-red mb-4">
           <span class="text-white text-2xl font-bold">D</span>
         </div>
         <h1 class="text-2xl font-bold text-gray-900">{{ $t('app.name') }}</h1>

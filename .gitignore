@@ -24,3 +24,8 @@ laravel-tmp/
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Frontend Build-Artefakte
+/public/frontend/
+frontend/node_modules/
+frontend/dist/
