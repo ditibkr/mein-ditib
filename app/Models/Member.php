@@ -62,8 +62,7 @@ class Member extends Model
     {
         return LogOptions::defaults()
             ->logAll()
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->logOnlyDirty();
     }
 
     public function getFullNameAttribute(): string

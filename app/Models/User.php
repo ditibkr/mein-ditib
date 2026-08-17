@@ -51,8 +51,7 @@ class User extends Authenticatable implements FilamentUser
     {
         return LogOptions::defaults()
             ->logOnly(['name', 'email', 'is_active', 'language_preference'])
-            ->logOnlyDirty()
-            ->dontSubmitEmptyLogs();
+            ->logOnlyDirty();
     }
 
     public function canAccessPanel(Panel $panel): bool
