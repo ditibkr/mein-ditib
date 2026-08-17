@@ -42,15 +42,6 @@ COPY docker/app/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
 
 WORKDIR /var/www/html
 
-# App-User anlegen
-RUN addgroup -g 1000 -S www && adduser -u 1000 -S www -G www
-
-COPY --chown=www:www . .
-
-RUN composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || true
-
-USER www
-
 EXPOSE 9000
 
 CMD ["php-fpm"]

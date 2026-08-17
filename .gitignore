@@ -14,18 +14,24 @@ laravel-tmp/
 /.vscode
 /.zed
 /auth.json
-/node_modules
-/public/build
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
 Homestead.json
 Homestead.yaml
 Thumbs.db
 
+# Laravel (innerhalb src/)
+src/.env
+src/.env.backup
+src/.env.production
+src/.env.local
+src/node_modules/
+src/public/build
+src/public/hot
+src/public/storage
+src/storage/*.key
+src/storage/pail
+src/vendor/
+
 # Frontend Build-Artefakte
-/public/frontend/
-frontend/node_modules/
-frontend/dist/
+src/public/frontend/
+src/frontend/node_modules/
+src/frontend/dist/

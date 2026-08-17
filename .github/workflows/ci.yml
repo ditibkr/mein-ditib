@@ -29,22 +29,26 @@ jobs:
           - 6379:6379
         options: --health-cmd="redis-cli ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
+    defaults:
+      run:
+        working-directory: src
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: PHP 8.3 Setup
+      - name: PHP 8.4 Setup
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, bcmath, pdo_mysql, redis, intl, gd, zip
           coverage: xdebug
 
       - name: Composer Cache
         uses: actions/cache@v4
         with:
-          path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          path: src/vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('src/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install Dependencies

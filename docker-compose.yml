@@ -7,9 +7,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      # app_public wird von der App populiert; Nginx liest daraus
-      - app_public:/var/www/html/public
-      - app_storage:/var/www/html/storage
+      - ./src:/var/www/html
     networks:
       - meinditib
     depends_on:
@@ -32,8 +30,7 @@ services:
     ports:
       - "8000:80"
     volumes:
-      # Shared volume mit App für statische Dateien
-      - app_public:/var/www/html/public:ro
+      - ./src:/var/www/html:ro
       - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
       - meinditib
@@ -90,7 +87,7 @@ services:
     working_dir: /var/www/html
     command: php artisan queue:work --sleep=3 --tries=3 --max-time=3600
     volumes:
-      - app_storage:/var/www/html/storage
+      - ./src:/var/www/html
     networks:
       - meinditib
     depends_on:
@@ -108,7 +105,7 @@ services:
     working_dir: /var/www/html
     command: sh -c "while true; do php artisan schedule:run; sleep 60; done"
     volumes:
-      - app_storage:/var/www/html/storage
+      - ./src:/var/www/html
     networks:
       - meinditib
     depends_on:
@@ -125,8 +122,4 @@ volumes:
   db_data:
     driver: local
   redis_data:
-    driver: local
-  app_storage:
-    driver: local
-  app_public:
     driver: local
