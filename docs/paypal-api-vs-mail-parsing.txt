@@ -1,0 +1,59 @@
+PayPal-JSON: Warum unterschiedliche Felder? API vs. Mail-Parsing
+=================================================================
+(Stand: 05.07.2026)
+
+Warum "unterschiedliche Felder"?
+--------------------------------
+Die Struktur des PayPal-JSON ist immer gleich (dokumentiertes API-Schema),
+aber PayPal lässt Felder weg, die für die jeweilige Transaktion nicht
+zutreffen. Beispiele:
+
+- transaction_note (Nachricht des Spenders): kommt nur, wenn der Spender
+  beim Zahlen etwas geschrieben hat
+- fee_amount (PayPal-Gebühr): nur, wenn Gebühren angefallen sind
+- shipping_info.address: nur, wenn eine Lieferadresse hinterlegt war —
+  deshalb hat unsere Sandbox-Spende #121 dort nur den Namen
+- cart_info: nur bei Warenkorb-Käufen, bei einer einfachen Spende fehlt
+  es komplett
+- Bei Gastzahlungen (Kreditkarte ohne PayPal-Konto) kann die
+  Spender-Adresse fehlen
+
+Es sind also keine Überraschungsfelder, sondern optionale Felder aus einem
+festen Schema. Deshalb ist die Anzeige nicht kaputt, wenn etwas fehlt —
+das Template (templates/paypal_mail.php) überspringt leere Felder und
+zeigt Unbekanntes generisch an.
+
+Vereinheitlichung gibt es schon
+-------------------------------
+Genau das macht ApiClient::mappen() (src/PayPal/ApiClient.php:240).
+Es übersetzt das variable JSON in den festen Spenden-Datensatz mit
+Fallbacks — z. B. Lieferadresse, sonst PayPal-Kontoadresse;
+strukturierter Name, sonst Vollname aufgeteilt.
+
+Für die Datenbank und die Bescheinigungen ist das Auslesen also bereits
+vereinheitlicht. Das rohe JSON in mail_body ist nur das Archiv-Original,
+so wie bei IMAP-Spenden die Original-Mail gespeichert wird.
+
+Ist Mail-Parsing besser? Nein, deutlich schlechter
+--------------------------------------------------
+
+                 | API (Transaction Search)        | Mail-Parsing (IMAP)
+-----------------+---------------------------------+---------------------------------
+Struktur         | Dokumentiertes, stabiles        | HTML-Mail, PayPal kann das
+                 | JSON-Schema                     | Layout jederzeit ändern
+Vollständigkeit  | Alle Transaktionen, auch bei    | Nur was ankommt (Spam-Filter,
+                 | Mail-Ausfall                    | gelöschte Mails)
+Sprache          | Sprachunabhängige Feldnamen     | Feld-Beschriftungen hängen von
+                 |                                 | der Kontosprache ab
+Datenqualität    | Exakte Beträge, IDs,            | Aus Text herausgeschnitten,
+                 | Zeitstempel                     | fehleranfällig
+
+Fazit
+-----
+Der API-Import ist die verlässlichere Quelle — die optionalen Felder sind
+kein Mangel der API, sondern spiegeln einfach wider, welche Daten die
+Transaktion tatsächlich hatte. Eine Mail hätte dieselben Lücken, nur
+schwerer erkennbar.
+
+Empfehlung: Beim API-Import als primärem Weg bleiben, Mail-Parsing nur
+als Fallback für Alt-Bestände.

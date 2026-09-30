@@ -1,0 +1,15 @@
+data/
+output/
+logs/
+vendor/
+*.sqlite
+*.log
+config/settings.php
+adminer-login.php
+public/guilloche_test.pdf
+
+# Backup-Dateien
+*_bac.php
+*_bac*.php
+Dockerfile copy
+*copy.php

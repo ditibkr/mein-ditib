@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup – Live-Protokoll | SpendenPortal</title>
+<style>
+  /* ── Design-Tokens aus portal.css übernommen ── */
+  :root {
+    --bg: #0c0f1a; --surface: #141827; --surface2: #1a2035; --surface3: #202540;
+    --border: #252c45; --border2: #2e3660;
+    --accent: #4f8ef7; --accent-h: #3a7de8; --accent2: #f7c94f;
+    --green: #3ecf8e; --red: #f76f4f; --orange: #f7994f; --purple: #a78bfa;
+    --text: #e8eaf0; --text2: #a0a8c0; --muted: #5a6280;
+    --radius: 10px; --radius-lg: 14px; --radius-xl: 18px;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --shadow: 0 4px 20px rgba(0,0,0,.35);
+    --tr: .22s cubic-bezier(.4,0,.2,1);
+  }
+  [data-theme="light"] {
+    --bg: #f2f4f9; --surface: #fff; --surface2: #eef1f7; --surface3: #e3e8f2;
+    --border: #dde2ee; --border2: #c8d1e4;
+    --accent: #3a7de8; --accent-h: #2b6cd6;
+    --text: #1a2035; --text2: #4a5578; --muted: #7a84a3;
+    --shadow: 0 4px 20px rgba(20,30,60,.08);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); font-size: 14px; line-height: 1.5; }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 80px; }
+
+  /* ── Kopfzeile ── */
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+  .topbar h1 { font-size: 21px; font-weight: 700; }
+  .topbar h1 small { display: block; font-size: 12px; font-weight: 400; color: var(--text2); }
+  .top-actions { display: flex; gap: 8px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+          box-shadow: var(--shadow); padding: 18px 20px; margin-bottom: 18px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .6px; color: var(--text2);
+             margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+  /* ── Formularelemente ── */
+  label.fl { display: block; font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+  input[type=date], input[type=time], input[type=text], textarea {
+    background: var(--surface2); border: 1px solid var(--border2); border-radius: var(--radius);
+    color: var(--text); font: inherit; padding: 8px 11px; width: 100%; transition: border-color var(--tr);
+  }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent); }
+  .grid3 { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .grid3 { grid-template-columns: 1fr; } }
+
+  /* ── Teilnehmer-Chips ── */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px;
+          background: var(--surface2); border: 1px solid var(--border2); border-radius: 20px;
+          cursor: pointer; user-select: none; transition: all var(--tr); font-size: 13px; }
+  .chip .role { color: var(--muted); font-size: 11px; }
+  .chip .tick { width: 15px; height: 15px; border-radius: 50%; border: 1.5px solid var(--muted);
+                display: inline-flex; align-items: center; justify-content: center; font-size: 10px;
+                color: transparent; transition: all var(--tr); flex: none; }
+  .chip.on { background: rgba(79,142,247,.14); border-color: var(--accent); }
+  .chip.on .tick { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .chip.add { border-style: dashed; color: var(--text2); }
+  .chip.add:hover { border-color: var(--accent); color: var(--accent); }
+  .chip .x { color: var(--muted); font-size: 12px; margin-left: 2px; }
+  .chip .x:hover { color: var(--red); }
+  #np-form { display: none; gap: 8px; margin-top: 12px; }
+  #np-form.open { display: flex; }
+  #np-form input { flex: 1; }
+  .tn-count { margin-left: auto; font-size: 12px; color: var(--muted); text-transform: none; letter-spacing: 0; }
+
+  /* ── Tagesordnungspunkte ── */
+  .top-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius-lg);
+              padding: 14px 16px; margin-bottom: 12px; }
+  .top-head { display: flex; align-items: center; gap: 10px; }
+  .top-num { flex: none; width: 30px; height: 30px; border-radius: 8px; background: var(--accent);
+             color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .top-head input { font-weight: 600; font-size: 15px; background: transparent; border-color: transparent; }
+  .top-head input:hover { border-color: var(--border2); }
+  .top-head input:focus { background: var(--surface); border-color: var(--accent); }
+  .sub-list { margin: 10px 0 0 40px; }
+  .sub-item { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 7px; }
+  .sub-letter { flex: none; margin-top: 8px; width: 18px; color: var(--accent2); font-weight: 600; font-size: 13px; }
+  .sub-item textarea { resize: none; overflow: hidden; min-height: 36px; line-height: 1.45; }
+  .icon-btn { flex: none; background: none; border: none; color: var(--muted); cursor: pointer;
+              font-size: 15px; padding: 8px 4px 0; transition: color var(--tr); }
+  .icon-btn:hover { color: var(--red); }
+  .top-item .icon-btn.del-top { padding-top: 4px; }
+
+  /* ── Buttons ── */
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 15px; border-radius: var(--radius);
+         border: 1px solid var(--border2); background: var(--surface2); color: var(--text);
+         font: inherit; font-weight: 600; cursor: pointer; transition: all var(--tr); }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-h); color: #fff; }
+  .btn.ghost { background: transparent; border-style: dashed; color: var(--text2); width: 100%; justify-content: center; }
+  .btn.ghost:hover { color: var(--accent); border-color: var(--accent); }
+  .btn.sm { padding: 5px 11px; font-size: 12.5px; font-weight: 500; }
+
+  /* ── Vorlagen-Verwaltung ── */
+  .h2-btn { margin-left: auto; background: none; border: 1px solid var(--border2); color: var(--text2);
+            border-radius: 8px; font: inherit; font-size: 11.5px; padding: 3px 10px; cursor: pointer;
+            text-transform: none; letter-spacing: 0; transition: all var(--tr); }
+  .h2-btn:hover, .h2-btn.on { border-color: var(--accent); color: var(--accent); }
+  .h2-btn.on { background: rgba(79,142,247,.12); }
+  .mng { display: none; margin-top: 6px; }
+  .mng.open { display: block; }
+  .mng-row { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+  .mng-row input, .mng-row textarea { font-size: 13px; }
+  .mng-row .grow { flex: 1; }
+  .mng-row .half { flex: 0 0 200px; }
+  .mng-hint { font-size: 11.5px; color: var(--muted); margin: 2px 0 10px; }
+  .cb { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--text2);
+        cursor: pointer; user-select: none; white-space: nowrap; align-self: center; }
+  .star-btn { flex: none; background: none; border: none; cursor: pointer; font-size: 14px;
+              color: var(--muted); padding: 6px 2px 0; transition: color var(--tr); }
+  .star-btn:hover { color: var(--accent2); }
+
+  /* ── Symbol-Auswahl (Emoji-Picker) ── */
+  .icon-pick { position: relative; flex: 0 0 44px; }
+  .icon-pick > button { width: 44px; height: 36px; font-size: 17px; background: var(--surface2);
+                        border: 1px solid var(--border2); border-radius: var(--radius); cursor: pointer;
+                        transition: border-color var(--tr); }
+  .icon-pick > button:hover { border-color: var(--accent); }
+  .icon-pop { display: none; position: absolute; top: 40px; left: 0; z-index: 30;
+              background: var(--surface); border: 1px solid var(--border2); border-radius: var(--radius-lg);
+              box-shadow: var(--shadow); padding: 10px; width: 264px;
+              grid-template-columns: repeat(8, 1fr); gap: 2px; }
+  .icon-pop.open { display: grid; }
+  .icon-pop span { font-size: 17px; text-align: center; padding: 5px 0; border-radius: 7px; cursor: pointer; }
+  .icon-pop span:hover { background: var(--surface3); }
+
+  /* ── Textbausteine ── */
+  .bausteine { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+  .bs-label { flex-basis: 100%; font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+  .bs { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; font-size: 12.5px;
+        background: rgba(167,139,250,.10); border: 1px solid rgba(167,139,250,.35); color: var(--purple);
+        border-radius: 16px; cursor: pointer; user-select: none; transition: all var(--tr); }
+  .bs:hover { background: rgba(167,139,250,.22); }
+  .bs.used { opacity: .38; }
+  .bs.used:hover { opacity: .7; }
+
+  /* ── Statuszeile / Autosave-Hinweis ── */
+  .savebar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
+             border-top: 1px solid var(--border); padding: 11px 20px; display: flex;
+             align-items: center; justify-content: center; gap: 14px; z-index: 10; }
+  .savebar .hint { font-size: 12px; color: var(--muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+  .mock-banner { background: rgba(247,201,79,.12); border: 1px solid rgba(247,201,79,.4);
+                 color: var(--accent2); border-radius: var(--radius); padding: 8px 14px;
+                 font-size: 12.5px; margin-bottom: 18px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="mock-banner">🧪 <b>Mockup</b> – noch keine Speicherung. Dient zur Abstimmung von Aufbau &amp; Bedienung.</div>
+
+  <div class="topbar">
+    <h1>📝 Protokoll zur Vorstandssitzung
+      <small>DITIB Türkisch-Islamische Gemeinde zu Krefeld e.V.</small>
+    </h1>
+    <div class="top-actions">
+      <button class="btn sm" onclick="toggleTheme()">🌓 Theme</button>
+      <button class="btn sm">📄 PDF-Vorschau</button>
+    </div>
+  </div>
+
+  <!-- ── Datum & Uhrzeit ── -->
+  <div class="card">
+    <h2>📅 Sitzungsdaten</h2>
+    <div class="grid3">
+      <div>
+        <label class="fl">Datum</label>
+        <input type="date" id="f-datum">
+      </div>
+      <div>
+        <label class="fl">Beginn</label>
+        <input type="time" value="13:00">
+      </div>
+      <div>
+        <label class="fl">Ende</label>
+        <input type="time" value="15:00">
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Teilnehmer ── -->
+  <div class="card">
+    <h2>👥 Anwesende <span class="tn-count" id="tn-count"></span>
+      <button class="h2-btn" id="tn-mng-btn" onclick="toggleMng('tn')">⚙ Vorlagen verwalten</button>
+    </h2>
+    <div class="chips" id="chips"></div>
+    <div id="np-form">
+      <input type="text" id="np-name" placeholder="Name, z. B. Temel Fidan">
+      <input type="text" id="np-role" placeholder="Funktion (optional)" style="max-width:200px">
+      <label class="cb"><input type="checkbox" id="np-save" checked> als Vorlage merken</label>
+      <button class="btn primary sm" onclick="addPerson()">Hinzufügen</button>
+    </div>
+    <div class="mng" id="tn-mng">
+      <p class="mng-hint">Vorlagen bearbeiten – Änderungen gelten für alle künftigen Protokolle (Mockup: im Browser gespeichert).</p>
+      <div id="tn-mng-list"></div>
+      <button class="btn sm" onclick="mngAddPerson()">＋ Neue Vorlage</button>
+    </div>
+  </div>
+
+  <!-- ── Tagesordnung ── -->
+  <div class="card">
+    <h2>📋 Tagesordnung
+      <button class="h2-btn" id="bs-mng-btn" onclick="toggleMng('bs')">⚙ Vorlagen verwalten</button>
+    </h2>
+    <div class="bausteine" id="bausteine">
+      <span class="bs-label">Textbausteine – Klick fügt den TOP unten an:</span>
+    </div>
+    <div class="mng" id="bs-mng">
+      <p class="mng-hint">TOP-Vorlagen bearbeiten – optionale Standard-Unterpunkte: eine Zeile = ein Unterpunkt.
+        Tipp: Über das ⭐ an jedem TOP lässt sich auch ein fertig geschriebener Punkt direkt als Vorlage übernehmen.</p>
+      <div id="bs-mng-list"></div>
+      <button class="btn sm" onclick="mngAddBs()">＋ Neue Vorlage</button>
+    </div>
+    <div id="tops"></div>
+    <button class="btn ghost" onclick="addTop()">＋ Tagesordnungspunkt hinzufügen</button>
+  </div>
+
+</div>
+
+<div class="savebar">
+  <span class="dot"></span>
+  <span class="hint">Live-Protokoll · automatisch gespeichert (Mockup: nicht aktiv)</span>
+  <button class="btn primary sm">✔ Protokoll abschließen</button>
+</div>
+
+<script>
+/* ── Vorlagen-Speicher (Mockup: localStorage, später DB-Tabellen) ── */
+const LS = { stamm: 'protoMock_stamm_v1', bs: 'protoMock_bausteine_v1' };
+function loadLS(key, fallback) {
+  try { const v = JSON.parse(localStorage.getItem(key)); return Array.isArray(v) ? v : fallback; }
+  catch { return fallback; }
+}
+const saveStamm = () => localStorage.setItem(LS.stamm, JSON.stringify(stamm.filter(p => !p.extra).map(({ name, role, on }) => ({ name, role, on }))));
+const saveBs    = () => localStorage.setItem(LS.bs, JSON.stringify(bausteine));
+
+/* ── Stammdaten: übliche Teilnehmer (Vorlagen; 'on' = standardmäßig angehakt) ── */
+const stammDefault = [
+  { name: 'Murat Özsoy',     role: 'Vorsitzender',                    on: true },
+  { name: 'Veysel Arsoy',    role: 'stellv. Vorsitzender',            on: true },
+  { name: 'Ramazan Kaya',    role: 'Sekretär',                        on: true },
+  { name: 'Nesime Eroglu',   role: 'stellv. Vorsitzende Frauenverband', on: true },
+  { name: 'Nazra Yesilyurt', role: 'Vorsitzende Jugendverband',       on: true },
+  { name: 'Nevzat Kus',      role: 'Beisitzer',                       on: true },
+  { name: 'Nihat Bilgic',    role: 'Architekt',                       on: false },
+  { name: 'Mehmet Selim',    role: 'Imam',                            on: false },
+];
+let stamm = loadLS(LS.stamm, stammDefault);
+
+const chipsEl = document.getElementById('chips');
+
+function renderChips() {
+  chipsEl.innerHTML = '';
+  stamm.forEach((p, i) => {
+    if (!p.name.trim()) return;                // leere Vorlagen-Zeilen (in Bearbeitung) ausblenden
+    const c = document.createElement('span');
+    c.className = 'chip' + (p.on ? ' on' : '');
+    c.innerHTML = `<span class="tick">✓</span> ${p.name} <span class="role">· ${p.role || '–'}</span>`
+      + (p.extra ? ` <span class="x" title="Entfernen" onclick="event.stopPropagation();removePerson(${i})">✕</span>` : '');
+    c.onclick = () => { p.on = !p.on; renderChips(); };
+    chipsEl.appendChild(c);
+  });
+  const add = document.createElement('span');
+  add.className = 'chip add';
+  add.textContent = '＋ Weitere Person';
+  add.onclick = () => {
+    document.getElementById('np-form').classList.toggle('open');
+    document.getElementById('np-name').focus();
+  };
+  chipsEl.appendChild(add);
+  document.getElementById('tn-count').textContent =
+    stamm.filter(p => p.on).length + ' anwesend';
+}
+
+function addPerson() {
+  const n = document.getElementById('np-name').value.trim();
+  if (!n) return;
+  const asVorlage = document.getElementById('np-save').checked;
+  stamm.push({ name: n, role: document.getElementById('np-role').value.trim(), on: true, extra: !asVorlage });
+  if (asVorlage) saveStamm();
+  document.getElementById('np-name').value = '';
+  document.getElementById('np-role').value = '';
+  document.getElementById('np-form').classList.remove('open');
+  renderChips();
+}
+function removePerson(i) { stamm.splice(i, 1); renderChips(); }
+document.getElementById('np-name').addEventListener('keydown', e => { if (e.key === 'Enter') addPerson(); });
+
+/* ── Vorlagen-Verwaltung: Teilnehmer ── */
+function toggleMng(which) {
+  document.getElementById(which + '-mng').classList.toggle('open');
+  document.getElementById(which + '-mng-btn').classList.toggle('on');
+  if (which === 'tn') renderTnMng(); else renderBsMng();
+}
+
+function renderTnMng() {
+  const list = document.getElementById('tn-mng-list');
+  list.innerHTML = '';
+  stamm.forEach((p, i) => {
+    if (p.extra) return;                       // Session-Gäste sind keine Vorlagen
+    const row = document.createElement('div');
+    row.className = 'mng-row';
+    const name = document.createElement('input');
+    name.className = 'grow'; name.value = p.name; name.placeholder = 'Name';
+    name.oninput = () => { p.name = name.value; saveStamm(); renderChips(); };
+    const role = document.createElement('input');
+    role.className = 'half'; role.value = p.role; role.placeholder = 'Funktion';
+    role.oninput = () => { p.role = role.value; saveStamm(); renderChips(); };
+    const std = document.createElement('label');
+    std.className = 'cb'; std.title = 'Bei neuem Protokoll automatisch angehakt';
+    const cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = !!p.on;
+    cb.onchange = () => { p.on = cb.checked; saveStamm(); renderChips(); };
+    std.append(cb, ' Standard');
+    const del = document.createElement('button');
+    del.className = 'icon-btn'; del.textContent = '🗑'; del.title = 'Vorlage löschen';
+    del.onclick = () => {
+      if (confirm(`Vorlage „${p.name}“ wirklich löschen?`)) {
+        stamm.splice(i, 1); saveStamm(); renderChips(); renderTnMng();
+      }
+    };
+    row.append(name, role, std, del);
+    list.appendChild(row);
+  });
+}
+
+function mngAddPerson() {
+  stamm.push({ name: '', role: '', on: false });
+  saveStamm(); renderTnMng(); renderChips();
+  const inputs = document.querySelectorAll('#tn-mng-list .mng-row input.grow');
+  inputs[inputs.length - 1].focus();
+}
+
+/* ── Tagesordnung ── */
+const topsEl = document.getElementById('tops');
+let tops = [
+  { title: 'Eröffnung und Begrüßung', subs: ['Der Vorsitzende eröffnet die Sitzung, begrüßt alle Anwesenden und dankt für die Teilnahme.'] },
+];
+
+/* ── Textbausteine: wiederkehrende TOPs (Vorlagen) ── */
+const bausteineDefault = [
+  { icon: '👋', title: 'Eröffnung und Begrüßung',
+    subs: ['Der Vorsitzende eröffnet die Sitzung, begrüßt alle Anwesenden und dankt für die Teilnahme.'] },
+  { icon: '🎪', title: 'Veranstaltung „…“', subs: [''] },
+  { icon: '👨‍👩‍👧', title: 'Statusbericht vom Elternverband', subs: [''] },
+  { icon: '🧕', title: 'Statusbericht vom Frauenverband', subs: [''] },
+  { icon: '🧑‍🤝‍🧑', title: 'Statusbericht vom Jugendverband', subs: [''] },
+  { icon: '🕌', title: 'Statusbericht vom Moscheebau', subs: [''] },
+  { icon: '💶', title: 'Finanzbericht', subs: [''] },
+  { icon: '🗳️', title: 'Wahlen', subs: [''] },
+  { icon: '🤝', title: 'Höflichkeitsbesuch', subs: [''] },
+  { icon: '💬', title: 'Anliegen der Vorstandsmitglieder', subs: [''] },
+  { icon: '📌', title: 'Verschiedenes / Sonstiges', subs: [''] },
+];
+let bausteine = loadLS(LS.bs, bausteineDefault);
+
+/* ── Symbol-Auswahl: kuratierte, vereinstypische Emojis ── */
+const ICONS = [
+  '👋','🎪','🕌','💶','🗳️','🤝','💬','📌','📅','👥','📄','⭐',
+  '🧕','🧑‍🤝‍🧑','👨‍👩‍👧','🏗️','🚗','📢','✉️','🎓','📖','🍽️','🎉','🕋',
+  '🧹','🔧','💻','🖨️','📊','⚖️','🏛️','🌙','🤲','🪧','🧾','🔑',
+];
+
+function iconPicker(value, onChange) {
+  const wrap = document.createElement('div');
+  wrap.className = 'icon-pick';
+  const btn = document.createElement('button');
+  btn.type = 'button'; btn.title = 'Symbol wählen';
+  btn.textContent = value || '📄';
+  const pop = document.createElement('div');
+  pop.className = 'icon-pop';
+  ICONS.forEach(e => {
+    const s = document.createElement('span');
+    s.textContent = e;
+    s.onclick = ev => { ev.stopPropagation(); btn.textContent = e; pop.classList.remove('open'); onChange(e); };
+    pop.appendChild(s);
+  });
+  btn.onclick = ev => {
+    ev.stopPropagation();
+    document.querySelectorAll('.icon-pop.open').forEach(p => p !== pop && p.classList.remove('open'));
+    pop.classList.toggle('open');
+  };
+  wrap.append(btn, pop);
+  return wrap;
+}
+document.addEventListener('click', () => document.querySelectorAll('.icon-pop.open').forEach(p => p.classList.remove('open')));
+
+/* ── Vorlagen-Verwaltung: Textbausteine ── */
+function renderBsMng() {
+  const list = document.getElementById('bs-mng-list');
+  list.innerHTML = '';
+  bausteine.forEach((b, i) => {
+    const row = document.createElement('div');
+    row.className = 'mng-row';
+    const icon = iconPicker(b.icon, v => { b.icon = v; saveBs(); renderBausteine(); });
+    const title = document.createElement('input');
+    title.className = 'half'; title.value = b.title; title.placeholder = 'Titel des TOP';
+    title.oninput = () => { b.title = title.value; saveBs(); renderBausteine(); };
+    const subs = document.createElement('textarea');
+    subs.className = 'grow'; subs.rows = 1;
+    subs.placeholder = 'Standard-Unterpunkte (eine Zeile = ein Unterpunkt, leer = keiner)';
+    subs.value = b.subs.filter(s => s.trim()).join('\n');
+    subs.oninput = () => {
+      b.subs = subs.value.split('\n').filter(s => s.trim());
+      if (!b.subs.length) b.subs = [''];
+      saveBs();
+      autoGrow(subs);
+    };
+    autoGrow(subs);
+    const del = document.createElement('button');
+    del.className = 'icon-btn'; del.textContent = '🗑'; del.title = 'Vorlage löschen';
+    del.onclick = () => {
+      if (confirm(`Vorlage „${b.title}“ wirklich löschen?`)) {
+        bausteine.splice(i, 1); saveBs(); renderBausteine(); renderBsMng();
+      }
+    };
+    row.append(icon, title, subs, del);
+    list.appendChild(row);
+  });
+  list.querySelectorAll('textarea').forEach(autoGrow);
+}
+
+function mngAddBs() {
+  bausteine.push({ icon: '📄', title: '', subs: [''] });
+  saveBs(); renderBsMng(); renderBausteine();
+  const inputs = document.querySelectorAll('#bs-mng-list .mng-row input.half');
+  inputs[inputs.length - 1].focus();
+}
+
+function saveTopAsVorlage(t) {
+  if (!t.title.trim()) { alert('Bitte zuerst einen Titel für den TOP vergeben.'); return; }
+  const existing = bausteine.find(b => b.title === t.title);
+  if (existing) {
+    if (!confirm(`Vorlage „${t.title}“ existiert bereits – mit den aktuellen Unterpunkten überschreiben?`)) return;
+    existing.subs = t.subs.filter(s => s.trim()).length ? [...t.subs] : [''];
+  } else {
+    bausteine.push({ icon: '⭐', title: t.title, subs: t.subs.filter(s => s.trim()).length ? [...t.subs] : [''] });
+  }
+  saveBs(); renderBausteine(); renderBsMng();
+}
+
+function renderBausteine() {
+  const box = document.getElementById('bausteine');
+  box.querySelectorAll('.bs').forEach(el => el.remove());
+  bausteine.forEach(b => {
+    if (!b.title.trim()) return;               // leere Vorlagen-Zeilen (in Bearbeitung) ausblenden
+    const el = document.createElement('span');
+    const used = tops.some(t => t.title === b.title);
+    el.className = 'bs' + (used ? ' used' : '');
+    el.title = used ? 'Bereits in der Tagesordnung – erneut einfügen möglich' : 'Als TOP einfügen';
+    el.innerHTML = `${b.icon} ${b.title}`;
+    el.onclick = () => {
+      tops.push({ title: b.title, subs: [...b.subs] });
+      renderTops();
+      if (b.title.includes('…')) {   // Platzhalter im Titel → erst Titel vervollständigen
+        const inputs = topsEl.querySelectorAll('.top-head input');
+        const t = inputs[inputs.length - 1];
+        t.focus(); t.selectionStart = t.selectionEnd = b.title.indexOf('…') + 1;
+      } else {
+        focusSub(tops.length - 1, 0);
+      }
+    };
+    box.appendChild(el);
+  });
+}
+
+function renderTops() {
+  topsEl.innerHTML = '';
+  tops.forEach((t, ti) => {
+    const box = document.createElement('div');
+    box.className = 'top-item';
+
+    const head = document.createElement('div');
+    head.className = 'top-head';
+    head.innerHTML = `<span class="top-num">${ti + 1}</span>`;
+    const title = document.createElement('input');
+    title.type = 'text';
+    title.placeholder = 'Titel des Tagesordnungspunkts …';
+    title.value = t.title;
+    title.oninput = () => t.title = title.value;
+    title.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); focusSub(ti, 0); } };
+    const star = document.createElement('button');
+    star.className = 'star-btn'; star.title = 'Diesen TOP als Vorlage speichern'; star.textContent = '⭐';
+    star.onclick = () => saveTopAsVorlage(t);
+    const del = document.createElement('button');
+    del.className = 'icon-btn del-top'; del.title = 'Punkt entfernen'; del.textContent = '🗑';
+    del.onclick = () => { if (t.subs.some(s => s.trim()) || t.title.trim() ? confirm(`TOP ${ti + 1} „${t.title || 'ohne Titel'}“ wirklich entfernen?`) : true) { tops.splice(ti, 1); renderTops(); } };
+    head.append(title, star, del);
+    box.appendChild(head);
+
+    const list = document.createElement('div');
+    list.className = 'sub-list';
+    t.subs.forEach((s, si) => {
+      const row = document.createElement('div');
+      row.className = 'sub-item';
+      const letter = document.createElement('span');
+      letter.className = 'sub-letter';
+      letter.textContent = String.fromCharCode(97 + si) + ')';
+      const ta = document.createElement('textarea');
+      ta.rows = 1;
+      ta.placeholder = 'Beschluss / Notiz … (Enter = nächster Unterpunkt)';
+      ta.value = s;
+      ta.dataset.ti = ti; ta.dataset.si = si;
+      ta.oninput = () => { t.subs[si] = ta.value; autoGrow(ta); };
+      ta.onkeydown = e => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          t.subs.splice(si + 1, 0, '');
+          renderTops(); focusSub(ti, si + 1);
+        }
+        if (e.key === 'Backspace' && ta.value === '' && t.subs.length > 1) {
+          e.preventDefault();
+          t.subs.splice(si, 1);
+          renderTops(); focusSub(ti, Math.max(0, si - 1));
+        }
+      };
+      const rm = document.createElement('button');
+      rm.className = 'icon-btn'; rm.title = 'Unterpunkt entfernen'; rm.textContent = '✕';
+      rm.onclick = () => { if (t.subs.length > 1) { t.subs.splice(si, 1); } else { t.subs[0] = ''; } renderTops(); };
+      row.append(letter, ta, rm);
+      list.appendChild(row);
+    });
+
+    const addSub = document.createElement('button');
+    addSub.className = 'btn sm'; addSub.style.marginTop = '4px';
+    addSub.textContent = '＋ Unterpunkt';
+    addSub.onclick = () => { t.subs.push(''); renderTops(); focusSub(ti, t.subs.length - 1); };
+    list.appendChild(addSub);
+
+    box.appendChild(list);
+    topsEl.appendChild(box);
+  });
+  document.querySelectorAll('.sub-item textarea').forEach(autoGrow);
+  renderBausteine();
+}
+
+function addTop() {
+  tops.push({ title: '', subs: [''] });
+  renderTops();
+  const t = topsEl.querySelectorAll('.top-head input');
+  t[t.length - 1].focus();
+}
+function focusSub(ti, si) {
+  const ta = topsEl.querySelector(`textarea[data-ti="${ti}"][data-si="${si}"]`);
+  if (ta) { ta.focus(); ta.selectionStart = ta.value.length; }
+}
+function autoGrow(ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+
+function toggleTheme() {
+  const r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === 'light' ? '' : 'light';
+}
+
+document.getElementById('f-datum').valueAsDate = new Date();
+renderChips();
+renderTops();
+</script>
+</body>
+</html>

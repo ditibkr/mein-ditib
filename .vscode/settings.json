@@ -1,0 +1,18 @@
+{
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/vendor": true,
+        "**/storage": true,
+        "**/docker": true,
+        "**/.git": true,
+        "**/tmp": true
+    },
+    "files.watcherExclude": {
+        "**/node_modules/**": true,
+        "**/vendor/**": true,
+        "**/storage/**": true,
+        "**/docker/**": true,
+        "**/.git/**": true
+    },
+    "search.followSymlinks": false
+}

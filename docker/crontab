@@ -1,0 +1,2 @@
+# Nächtlicher Spenden-Job
+0 2 * * * php /var/www/html/src/cron_job.php >> /var/www/html/logs/cron.log 2>&1

@@ -1,0 +1,45 @@
+services:
+  spendenportal:
+    build: .
+    container_name: spendenportal_php
+    restart: unless-stopped
+    expose:
+      - "3232"
+    volumes:
+      - ./public:/var/www/html/public
+      - ./src:/var/www/html/src
+      - ./templates:/var/www/html/templates
+      - ./static:/var/www/html/static
+      - ./config:/var/www/html/config
+      - ./output:/var/www/html/output
+      - ./data:/var/www/html/data
+      - ./logs:/var/www/html/logs
+      - ./pdf_templates:/var/www/html/pdf_templates
+      # Ablage für den Massenimport alter Bescheinigungen (PDFs hierher kopieren)
+      - ./import_eingang:/var/www/html/import_eingang
+    environment:
+      - TZ=Europe/Berlin
+    networks:
+      - proxy-network
+    security_opt:
+      - no-new-privileges:true
+
+  sqliteweb:
+    image: coleifer/sqlite-web
+    container_name: spendenportal_db
+    restart: unless-stopped
+    expose:
+      - "8080"
+    volumes:
+      - ./data:/data
+    command: sqlite_web --host 0.0.0.0 --port 8080 /data/spenden.sqlite
+    networks:
+      - proxy-network
+    security_opt:
+      - no-new-privileges:true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  proxy-network:
+    external: true
